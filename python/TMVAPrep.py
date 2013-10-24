@@ -181,7 +181,7 @@ def Boosted_Angle(pt1,eta1,phi1,pt2,eta2,phi2,ptz,etaz,phiz,mass):
 	#print "******&&&&******", angle, angleBoost
 	return [angleBoost,angle,angleBoost_Z1,angle_Z1,angle_Z2,Boostdiff11,Boostdiff22,Boostdiff12,Boostdiff21]
 
-def Convert(f,filesANDsamples,indir,lumi,TeV8):
+def Convert(f,filesANDsamples,filesANDsamples2,indir,lumi,TeV8):
 
 	fin = TFile.Open(f,"")
 	print f, "F"*20
@@ -190,7 +190,7 @@ def Convert(f,filesANDsamples,indir,lumi,TeV8):
 	BIN2 = H.GetBinContent(2)
 	BIN3 = H.GetBinContent(3)
 
-	RND_CUT = 0.5
+	RND_CUT = 0.66
 
 	L1 = TLorentzVector() ####### causes function to be out of scope?!
 	L2 = TLorentzVector()
@@ -218,7 +218,10 @@ def Convert(f,filesANDsamples,indir,lumi,TeV8):
 		tagalongvariables.append(y.GetName())
 	#print tagalongvariables
 
-	addinvariables = ['XS','BR','LUM','NGE','B2','B3','RND','WT','training','Wscale','Zscale']
+	addinvariables = ['XS','BR','LUM','NGE','B2','B3','RND']#,'WT']
+	addinvariables += ['WT0','WT1','WT2','WT3','WT4']
+	addinvariables += ['training0','training1','training2','training3','training4']#,'Wscale','Zscale']
+	addinvariables += ['XS2','BR2']
 	addinvariables += ['phil1met','phil2met','Thrust','DeltaPz','DeltaPhi_ZH','TransMass3','TransMass4','CScostheta','CMsintheta']
 	addinvariables += ['Theta_lab','ZL1_Boost','ZL1_lab','ZL2_lab','ZRapidity','Lep2Dover3D','ZMEToverLep3D','ZMEToverLep2D','l1l2metPt','l1l2minusmetPt']
 	addinvariables += ['Boost11','Boost22','Boost12','Boost21']
@@ -269,36 +272,53 @@ def Convert(f,filesANDsamples,indir,lumi,TeV8):
 			if "Data" in f:
 				XS[0]=1.0
 				BR[0]=1.0
+				XS2[0]=1.0
+				BR2[0]=1.0
 				LUM[0]=1.0
 				NGE[0]= 1.0
 				B2[0] = 1.0
 				B3[0] = 1.0
 				RND[0] = 1.0
-				WT[0] = 1.0
-				training[0] = 0.0
-				Wscale[0] = 1.0
-				Zscale[0] = 1.0
+				#WT[0] = 1.0
+				for rr in range(5):
+					exec('training'+str(rr)+'[0]=0.0')
+					exec('WT'+str(rr)+'[0]=1.0')
+				# Wscale[0] = 1.0
+				# Zscale[0] = 1.0
 			else:
 				XS[0]=filesANDsamples[f.replace(indir,'')][1]
 				BR[0]=filesANDsamples[f.replace(indir,'')][2]
+				XS2[0]=filesANDsamples2[f.replace(indir,'')][1]
+				BR2[0]=filesANDsamples2[f.replace(indir,'')][2]
 				LUM[0]=lumi
 				NGE[0]= NUMGENEVENT
 				B2[0] = BIN2
 				B3[0] = BIN3
-				Wscale[0] = scale2data(f,finstate[0],TeV8)[0]
-				Zscale[0] = scale2data(f,finstate[0],TeV8)[1]
+				# Wscale[0] = scale2data(f,finstate[0],TeV8)[0]
+				# Zscale[0] = scale2data(f,finstate[0],TeV8)[1]
 				if SYS.replace("finalTree","sys") == "sys":
 					RND[0] = 1.0*random.uniform(0,1) #only do training/testing on non-varied
-					if (RND[0] < RND_CUT):
-						WT[0] = 1.0/(RND_CUT) #testing-training
-						training[0]=1.0
-					else:
-						WT[0] = 1.0/(1.0-RND_CUT) #application
-						training[0]=0.0
+					# if (RND[0] < RND_CUT):
+					# 	WT[0] = 1.0/(RND_CUT) #testing-training
+					# 	#training0[0]=1.0
+					# else:
+					# 	WT[0] = 1.0/(1.0-RND_CUT) #application
+						#training0[0]=0.0
+					for rr in range(5):
+						if (1.0*random.uniform(0,1) < RND_CUT):
+							exec('training'+str(rr)+'[0]=1.0')
+							exec('WT'+str(rr)+'[0]=1.0/(RND_CUT)')
+						else:
+							exec('training'+str(rr)+'[0]=0.0')
+							exec('WT'+str(rr)+'[0]=1.0/(1.0-RND_CUT)')
 				else:
 					RND[0] = 1.0
-					WT[0]=1.0
-					training[0]=0.0
+					#WT[0]=1.0
+
+					for rr in range(5):
+						exec('training'+str(rr)+'[0]=0.0')
+						exec('WT'+str(rr)+'[0]=1.0')
+
 
 			L1.SetPtEtaPhiM(l1pt[0],l1eta[0],l1phi[0],0)
 			L2.SetPtEtaPhiM(l2pt[0],l2eta[0],l2phi[0],0)
@@ -367,9 +387,11 @@ def Convert(f,filesANDsamples,indir,lumi,TeV8):
 
 # WHICH ENERGY?
 TeV8 = True
-outputdir="/afs/cern.ch/work/c/chasco/WDS_8/"
+outputdir="/afs/cern.ch/work/c/chasco/OCT19_p66_8/"
 
 SampleList = []
+SampleList1 = []
+SampleList2 = []
 if (TeV8): #organize this better
 	lumi = 19700
 	 #sample, cross section, branching ratio
@@ -389,22 +411,22 @@ if (TeV8): #organize this better
 	SampleList.append(['WW',57.1097,0.104976])
 	SampleList.append(['WZ',32.3,0.032715576])
 	SampleList.append(['ZZ',0.355036,1])
-	# SampleList.append(['ZH105',0.6750,0.100974])
-	# SampleList.append(['ZH115',0.5117,0.100974])
-	# SampleList.append(['ZH125',0.3943,0.100974])
-	# SampleList.append(['ZH135',0.3074,0.100974])
-	# SampleList.append(['ZH145',0.2424,0.100974])
-	SampleList.append(['ZH105',0.7022,0.100974])
-	SampleList.append(['ZH115',0.5358,0.100974])
-	SampleList.append(['ZH125',0.4153,0.100974])
-	SampleList.append(['ZH135',0.3259,0.100974])
-	SampleList.append(['ZH145',0.2583,0.100974])
+	SampleList2.append(['ZH105',0.6750,0.100974])
+	SampleList2.append(['ZH115',0.5117,0.100974])
+	SampleList2.append(['ZH125',0.3943,0.100974])
+	SampleList2.append(['ZH135',0.3074,0.100974])
+	SampleList2.append(['ZH145',0.2424,0.100974])
+	SampleList1.append(['ZH105',0.7022,0.100974])
+	SampleList1.append(['ZH115',0.5358,0.100974])
+	SampleList1.append(['ZH125',0.4153,0.100974])
+	SampleList1.append(['ZH135',0.3259,0.100974])
+	SampleList1.append(['ZH145',0.2583,0.100974])
 	SampleList.append(['Data',1,1])
 
 	Processes = []
 	XSections = []
 	BranchRat = []
-	for s in SampleList:
+	for s in (SampleList+SampleList1):
 		Processes.append(s[0])
 		XSections.append(s[1])
 		BranchRat.append(s[2])
@@ -430,23 +452,23 @@ else:
 	SampleList.append(['WW',5.5,1])
 	SampleList.append(['WZ',0.856,1])
 	SampleList.append(['ZZ',0.260094,1]) #"br":[0.038647521,0.994055467]
-	# SampleList.append(['ZH105',0.5449,0.100974])
-	# SampleList.append(['ZH115',0.4107,0.100974])
-	# SampleList.append(['ZH125',0.3158,0.100974])
-	# SampleList.append(['ZH135',0.2453,0.100974])
-	# SampleList.append(['ZH145',0.1930,0.100974])
-	SampleList.append(['ZH105',0.5724,0.100974])
-	SampleList.append(['ZH115',0.4345,0.100974])
-	SampleList.append(['ZH125',0.3351,0.100974])
-	SampleList.append(['ZH135',0.2616,0.100974])
-	SampleList.append(['ZH145',0.2068,0.100974])
+	SampleList2.append(['ZH105',0.5449,0.100974])
+	SampleList2.append(['ZH115',0.4107,0.100974])
+	SampleList2.append(['ZH125',0.3158,0.100974])
+	SampleList2.append(['ZH135',0.2453,0.100974])
+	SampleList2.append(['ZH145',0.1930,0.100974])
+	SampleList1.append(['ZH105',0.5724,0.100974])
+	SampleList1.append(['ZH115',0.4345,0.100974])
+	SampleList1.append(['ZH125',0.3351,0.100974])
+	SampleList1.append(['ZH135',0.2616,0.100974])
+	SampleList1.append(['ZH145',0.2068,0.100974])
 	#SampleList.append(['ZH150',0.01171,0.100974])
 	SampleList.append(['Data',1,1])
 
 	Processes = []
 	XSections = []
 	BranchRat = []
-	for s in SampleList:
+	for s in (SampleList+SampleList1):
 		Processes.append(s[0])
 		XSections.append(s[1])
 		BranchRat.append(s[2])
@@ -459,11 +481,18 @@ else:
 			Lumi.append(lumi)
 
 #RND_CUT = 1.0/3.0
-SampleList.sort()
+SampleList_1 = SampleList + SampleList1
+SampleList_2 = SampleList + SampleList2
+SampleList_1.sort()
+SampleList_2.sort()
 filesANDsamples = dict()
-for samp in SampleList:
+filesANDsamples2 = dict()
+for samp in SampleList_1:
 	if 'Data' not in samp[0]:
 		filesANDsamples[samp[0].replace('.','')+'.root']=samp
+for samp in SampleList_2:
+	if 'Data' not in samp[0]:
+		filesANDsamples2[samp[0].replace('.','')+'.root']=samp
 
 #print filesANDsamples, lumi, filesANDsamples['ZZ.root'],  filesANDsamples['ZZ.root'][1]
 #sys.exit("ok")
@@ -534,12 +563,12 @@ for i in infiles:
 	if "Data" not in i:
 		MCinfiles.append(i)
 
-print len(MCinfiles), len(SampleList), "compare "*10
+print len(MCinfiles), len(SampleList+SampleList1), "compare "*10
 
 #infiles = [infiles[-2]] #one file run, COMMENT THIS!!!!
 
 for f in infiles: #loop over files
-	Convert(f,filesANDsamples,indir,lumi,TeV8)
+	Convert(f,filesANDsamples,filesANDsamples2,indir,lumi,TeV8)
 
 os.system("mkdir "+outputdir)
 os.system("cp "+outdir+"*.root "+outputdir)
