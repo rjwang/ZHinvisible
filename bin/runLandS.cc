@@ -256,157 +256,45 @@ int main(int argc, char* argv[])
     //get input arguments
     for(int i=1; i<argc; i++) {
         string arg(argv[i]);
-        if(arg.find("--help")          !=string::npos) {
-            printHelp();
-            return -1;
-        } else if(arg.find("--subNRB12") !=string::npos) {
-            subNRB2012=true;
-            skipWW=false;
-            printf("subNRB2012 = True\n");
-        } else if(arg.find("--subNRB")   !=string::npos) {
-            subNRB2011=true;
-            skipWW=true;
-            printf("subNRB2011 = True\n");
-        } else if(arg.find("--subDY")    !=string::npos) {
-            subDY=true;
-            DYFile=argv[i+1];
-            i++;
-            printf("Z+Jets will be replaced by %s\n",DYFile.Data());
-        } else if(arg.find("--subWZ")    !=string::npos) {
-            subWZ=true;
-            printf("WZ will be estimated from 3rd lepton SB\n");
-        } else if(arg.find("--DDRescale")!=string::npos && i+1<argc)  {
-            sscanf(argv[i+1],"%lf",&DDRescale);
-            i++;
-        } else if(arg.find("--MCRescale")!=string::npos && i+1<argc)  {
-            sscanf(argv[i+1],"%lf",&MCRescale);
-            i++;
-        } else if(arg.find("--HWW")      !=string::npos) {
-            skipWW=false;
-            printf("HWW = True\n");
-        } else if(arg.find("--skipGGH")  !=string::npos) {
-            skipGGH=true;
-            printf("skipGGH = True\n");
-        } else if(arg.find("--skipQQH")  !=string::npos) {
-            skipQQH=true;
-            printf("skipQQH = True\n");
-        } else if(arg.find("--blindWithSignal")    !=string::npos) {
-            blindData=true;
-            blindWithSignal=true;
-            printf("blindData = True; blindWithSignal = True\n");
-        } else if(arg.find("--blind")    !=string::npos) {
-            blindData=true;
-            printf("blindData = True\n");
-        } else if(arg.find("--closure")  !=string::npos) {
-            MCclosureTest=true;
-            printf("MCclosureTest = True\n");
-        } else if(arg.find("--shapeMinVBF") !=string::npos && i+1<argc)  {
-            sscanf(argv[i+1],"%lf",&shapeMinVBF);
-            i++;
-            printf("Min cut on shape for VBF = %f\n", shapeMinVBF);
-        } else if(arg.find("--shapeMaxVBF") !=string::npos && i+1<argc)  {
-            sscanf(argv[i+1],"%lf",&shapeMaxVBF);
-            i++;
-            printf("Max cut on shape for VBF = %f\n", shapeMaxVBF);
-        } else if(arg.find("--shapeMin") !=string::npos && i+1<argc)  {
-            sscanf(argv[i+1],"%lf",&shapeMin);
-            i++;
-            printf("Min cut on shape = %f\n", shapeMin);
-        } else if(arg.find("--shapeMax") !=string::npos && i+1<argc)  {
-            sscanf(argv[i+1],"%lf",&shapeMax);
-            i++;
-            printf("Max cut on shape = %f\n", shapeMax);
-        } else if(arg.find("--interf")    !=string::npos) {
-            doInterf=true;
-            printf("doInterf = True\n");
-        } else if(arg.find("--indexvbf") !=string::npos && i+1<argc)  {
-            sscanf(argv[i+1],"%i",&indexvbf);
-            i++;
-            printf("indexVBF = %i\n", indexvbf);
-        } else if(arg.find("--indexL")    !=string::npos && i+1<argc)  {
-            sscanf(argv[i+1],"%i",&indexcutL);
-            i++;
-            printf("indexL = %i\n", indexcutL);
-        } else if(arg.find("--indexR")    !=string::npos && i+1<argc)  {
-            sscanf(argv[i+1],"%i",&indexcutR);
-            i++;
-            printf("indexR = %i\n", indexcutR);
-        } else if(arg.find("--index")    !=string::npos && i+1<argc)  {
-            sscanf(argv[i+1],"%i",&indexcut);
-            i++;
-            printf("index = %i\n", indexcut);
-        } else if(arg.find("--in")       !=string::npos && i+1<argc)  {
-            inFileUrl = argv[i+1];
-            i++;
-            printf("in = %s\n", inFileUrl.Data());
-        } else if(arg.find("--json")     !=string::npos && i+1<argc)  {
-            jsonFile  = argv[i+1];
-            i++;
-            printf("json = %s\n", jsonFile.Data());
-        } else if(arg.find("--histo")    !=string::npos && i+1<argc)  {
-            histo     = argv[i+1];
-            i++;
-            printf("histo = %s\n", histo.Data());
-        } else if(arg.find("--mL")       !=string::npos && i+1<argc)  {
-            sscanf(argv[i+1],"%i",&massL );
-            i++;
-            printf("massL = %i\n", massL);
-        } else if(arg.find("--mR")       !=string::npos && i+1<argc)  {
-            sscanf(argv[i+1],"%i",&massR );
-            i++;
-            printf("massR = %i\n", massR);
-        } else if(arg.find("--m")        !=string::npos && i+1<argc)  {
-            sscanf(argv[i+1],"%i",&mass );
-            i++;
-            printf("mass = %i\n", mass);
-        } else if(arg.find("--atgc")     !=string::npos && i+1<argc)  {
-            atgcpar = argv[i+1];
-            i++;
-            printf("aTGC parameter: %s\n", atgcpar.Data());
-        } else if(arg.find("--bins")     !=string::npos && i+1<argc)  {
-            char* pch = strtok(argv[i+1],",");
-            printf("bins are : ");
-            while (pch!=NULL) {
-                printf(" %s ",pch);
-                AnalysisBins.push_back(pch);
-                pch = strtok(NULL,",");
-            }
-            printf("\n");
-            i++;
-        } else if(arg.find("--channels") !=string::npos && i+1<argc)  {
-            char* pch = strtok(argv[i+1],",");
-            printf("channels are : ");
-            while (pch!=NULL) {
-                printf(" %s ",pch);
-                Channels.push_back(pch);
-                pch = strtok(NULL,",");
-            }
-            printf("\n");
-            i++;
-        } else if(arg.find("--fast")     !=string::npos) {
-            fast=true;
-            printf("fast = True\n");
-        } else if(arg.find("--postfix")   !=string::npos && i+1<argc)  {
-            postfix = argv[i+1];
-            systpostfix = argv[i+1];
-            i++;
-            printf("postfix '%s' will be used\n", postfix.Data());
-        } else if(arg.find("--systpostfix")   !=string::npos && i+1<argc)  {
-            systpostfix = argv[i+1];
-            i++;
-            printf("systpostfix '%s' will be used\n", systpostfix.Data());
-        } else if(arg.find("--syst")     !=string::npos) {
-            runSystematics=true;
-            printf("syst = True\n");
-        } else if(arg.find("--shape")    !=string::npos) {
-            shape=true;
-            printf("shapeBased = True\n");
-        } else if(arg.find("--aTGC_Syst")      !=string::npos) {
-            sscanf(argv[i+1],"%f",&sysSherpa);
-            i++;
-            printf("Additional systematic on the shape setted: %f\n", sysSherpa);
-        }
+        if(arg.find("--help")          !=string::npos) { printHelp(); return -1; }
+        else if(arg.find("--subNRB12") !=string::npos) { subNRB2012=true; skipWW=false; printf("subNRB2012 = True\n");}
+        else if(arg.find("--subNRB")   !=string::npos) { subNRB2011=true; skipWW=true; printf("subNRB2011 = True\n");}
+        else if(arg.find("--subDY")    !=string::npos) { subDY=true; DYFile=argv[i+1]; i++; printf("Z+Jets will be replaced by %s\n",DYFile.Data());}
+        else if(arg.find("--subWZ")    !=string::npos) { subWZ=true; printf("WZ will be estimated from 3rd lepton SB\n");}
+        else if(arg.find("--DDRescale")!=string::npos && i+1<argc)  { sscanf(argv[i+1],"%lf",&DDRescale); i++;}
+        else if(arg.find("--MCRescale")!=string::npos && i+1<argc)  {sscanf(argv[i+1],"%lf",&MCRescale); i++;}
+        else if(arg.find("--HWW")      !=string::npos) { skipWW=false;printf("HWW = True\n");}
+        else if(arg.find("--skipGGH")  !=string::npos) { skipGGH=true;printf("skipGGH = True\n");}
+        else if(arg.find("--skipQQH")  !=string::npos) { skipQQH=true;printf("skipQQH = True\n");}
+        else if(arg.find("--blindWithSignal")  !=string::npos) {blindData=true; blindWithSignal=true; printf("blindData = True; blindWithSignal = True\n");}
+        else if(arg.find("--blind")    !=string::npos) { blindData=true; printf("blindData = True\n");}
+        else if(arg.find("--closure")  !=string::npos) {MCclosureTest=true;printf("MCclosureTest = True\n");}
+        else if(arg.find("--shapeMinVBF") !=string::npos && i+1<argc) {sscanf(argv[i+1],"%lf",&shapeMinVBF);i++;printf("Min cut on shape for VBF = %f\n", shapeMinVBF);}
+        else if(arg.find("--shapeMaxVBF") !=string::npos && i+1<argc) {sscanf(argv[i+1],"%lf",&shapeMaxVBF);i++;printf("Max cut on shape for VBF = %f\n", shapeMaxVBF);}
+        else if(arg.find("--shapeMin") !=string::npos && i+1<argc)  {sscanf(argv[i+1],"%lf",&shapeMin);i++;printf("Min cut on shape = %f\n", shapeMin);}
+        else if(arg.find("--shapeMax") !=string::npos && i+1<argc)  {sscanf(argv[i+1],"%lf",&shapeMax);i++;printf("Max cut on shape = %f\n", shapeMax);}
+        else if(arg.find("--interf")   !=string::npos) {doInterf=true;printf("doInterf = True\n");}
+        else if(arg.find("--indexvbf") !=string::npos && i+1<argc)  {sscanf(argv[i+1],"%i",&indexvbf);i++;printf("indexVBF = %i\n", indexvbf);}
+        else if(arg.find("--indexL")   !=string::npos && i+1<argc)  {sscanf(argv[i+1],"%i",&indexcutL);i++;printf("indexL = %i\n", indexcutL);}
+        else if(arg.find("--indexR")   !=string::npos && i+1<argc)  {sscanf(argv[i+1],"%i",&indexcutR);i++;printf("indexR = %i\n", indexcutR);}
+        else if(arg.find("--index")    !=string::npos && i+1<argc)  {sscanf(argv[i+1],"%i",&indexcut);i++;printf("index = %i\n", indexcut);}
+        else if(arg.find("--in")       !=string::npos && i+1<argc)  {inFileUrl = argv[i+1];i++;printf("in = %s\n", inFileUrl.Data());}
+        else if(arg.find("--json")     !=string::npos && i+1<argc)  {jsonFile  = argv[i+1];i++;printf("json = %s\n", jsonFile.Data());}
+        else if(arg.find("--histo")    !=string::npos && i+1<argc)  {histo     = argv[i+1];i++;printf("histo = %s\n", histo.Data());}
+        else if(arg.find("--mL")       !=string::npos && i+1<argc)  {sscanf(argv[i+1],"%i",&massL );i++;printf("massL = %i\n", massL);}
+        else if(arg.find("--mR")       !=string::npos && i+1<argc)  {sscanf(argv[i+1],"%i",&massR );i++;printf("massR = %i\n", massR);}
+        else if(arg.find("--m")        !=string::npos && i+1<argc)  {sscanf(argv[i+1],"%i",&mass );i++;printf("mass = %i\n", mass);}
+        else if(arg.find("--atgc")     !=string::npos && i+1<argc)  {atgcpar = argv[i+1];i++;printf("aTGC parameter: %s\n", atgcpar.Data());}
+        else if(arg.find("--bins")     !=string::npos && i+1<argc)  {char* pch = strtok(argv[i+1],",");printf("bins are : ");while (pch!=NULL) {printf(" %s ",pch);AnalysisBins.push_back(pch);pch = strtok(NULL,",");}printf("\n");i++;}
+        else if(arg.find("--channels") !=string::npos && i+1<argc)  {char* pch = strtok(argv[i+1],",");printf("channels are : ");while (pch!=NULL) {printf(" %s ",pch);Channels.push_back(pch);pch = strtok(NULL,",");}printf("\n");i++;}
+        else if(arg.find("--fast")     !=string::npos) {fast=true;printf("fast = True\n");}
+        else if(arg.find("--postfix")  !=string::npos && i+1<argc)  {postfix = argv[i+1];systpostfix = argv[i+1];i++;printf("postfix '%s' will be used\n", postfix.Data());}
+        else if(arg.find("--systpostfix") !=string::npos && i+1<argc)  {systpostfix = argv[i+1];i++;printf("systpostfix '%s' will be used\n", systpostfix.Data());}
+        else if(arg.find("--syst")     !=string::npos) {runSystematics=true;printf("syst = True\n");}
+        else if(arg.find("--shape")    !=string::npos) {shape=true;printf("shapeBased = True\n");}
+        else if(arg.find("--aTGC_Syst")!=string::npos) {sscanf(argv[i+1],"%f",&sysSherpa);i++;printf("Additional systematic on the shape setted: %f\n", sysSherpa);}
     }
+    
     if(jsonFile.IsNull() || inFileUrl.IsNull() || histo.IsNull() || indexcut == -1 || mass==-1) {
         printHelp();
         return -1;
